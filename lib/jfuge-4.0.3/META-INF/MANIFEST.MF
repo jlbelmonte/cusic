@@ -1,0 +1,22 @@
+Manifest-Version: 1.0
+Created-By: Fat Jar Eclipse Plug-In
+
+Name: nu/xom/
+Sealed: true
+
+Name: nu/xom/xslt/
+Sealed: true
+
+Name: nu/xom/xinclude/
+Sealed: true
+
+Name: nu/xom/xerces/
+Sealed: true
+
+Name: nu/xom/converters/
+Sealed: true
+
+Name: nu/xom/canonical/
+Sealed: true
+
+

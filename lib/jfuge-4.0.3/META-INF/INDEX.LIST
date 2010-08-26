@@ -1,0 +1,14 @@
+JarIndex-Version: 1.0
+
+xom-1.0d25.jar
+nu/xom/xinclude
+nu/xom/samples
+nu/xom/tests
+nu
+nu/xom/xslt
+nu/xom/canonical
+nu/xom
+nu/xom/converters
+nu/xom/xerces
+nu/xom/benchmarks
+nu/xom/pantry
