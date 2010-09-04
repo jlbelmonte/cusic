@@ -23,41 +23,45 @@ import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 
 
 public class SVNActivityCollector {
-	Logger logger = Logger.getLogger(SVNActivityCollector.class);
+//	Logger logger = Logger.getLogger(SVNActivityCollector.class);
+	private ArrayList<Map<String, Object>> commitsData;
 	
 	static {
 		DAVRepositoryFactory.setup();
 	}
 	
-	public void process(Repository repo) {
+	public List<Map<String,Object>> process(Repository repo) {
 
 		try {
 			SVNRepository repository = SVNRepositoryFactory.create(SVNURL.parseURIEncoded(repo.uri));
-			logger.info("Processing " + repo.uri);
-
-			repository.log(null, 1, 0L, true, false, new MyISVNLogEntryHandler(repo));
+			long rev = repository.getLatestRevision();
+//			logger.info("Processing " + repo.uri);
+			commitsData = new ArrayList<Map<String,Object>>();
+			repository.log(null, 0,rev, true, false, new MyISVNLogEntryHandler(repo,commitsData));
+			return commitsData;
 		} catch(SVNException e) {
-			logger.error("Error at svn process", e);
+//			logger.error("Error at svn process", e);
 		}
+		return null;
 	}
 	
 	class MyISVNLogEntryHandler implements ISVNLogEntryHandler {
 
 		private Repository repository;
-		
-		public MyISVNLogEntryHandler(Repository repository) {
+		private List<Map<String,Object>> commits;
+
+		public MyISVNLogEntryHandler(Repository repository, List<Map<String, Object>> commitsData) {
 			this.repository = repository;
+			this.commits = commitsData;
 		}
 		
 		public void handleLogEntry(SVNLogEntry logMessage) throws SVNException {
 			String author = logMessage.getAuthor();
-			if(author == null) return;
 			
 			Date date = logMessage.getDate();
 			String revision = Long.toString(logMessage.getRevision());
 			
 			
-			Map<Object, Object> commit = new HashMap();
 			Map<String,Object> info = new HashMap();
 			info.put("date", date.toString());
 			info.put("message", logMessage.getMessage());
@@ -87,9 +91,17 @@ public class SVNActivityCollector {
 			info.put("modified", modified);
 			info.put("deleted", deleted);
 			info.put("replaced", replaced);
-
+			info.put("revision", revision);
 			//ADD THE COMMIT TO THE REPO
-			commit.put(""+revision,info);
+			commits.add(info);
 		}
+	}
+	
+	public static void main(String[] args) {
+		SVNActivityCollector act = new SVNActivityCollector();
+		Repository repo = new Repository();
+		repo.type="SVN";
+		repo.uri="http://dmo-compact.googlecode.com/svn/trunk";
+		act.process(repo);
 	}
 }
